@@ -21,9 +21,9 @@ const SEED_USERS = [
     permissions: f.permissions,
   })),
   {
-    Name: 'Meera Iyer', Role: 'research_office', Dept: 'Research Office',
-    email: 'grants.cell@mist.edu.in', title: 'Research Office — Grants Cell',
-    userId: 'usr-meera', password: 'password123',
+    Name: 'Research & Development Office', Role: 'research_office', Dept: 'Office of Dean R&D',
+    email: 'grants.cell@mist.edu.in', title: 'Grants Cell & Compliance',
+    userId: 'usr-research-office', password: 'password123',
     permissions: ['run:create', 'run:read:all', 'review:approve', 'package:view', 'audit:read', 'version:rollback'],
   },
   {
@@ -50,17 +50,23 @@ async function connectDB() {
     mongoose.set('strictQuery', false);
     await mongoose.connect(uri, {
       dbName: process.env.MONGODB_DB || 'research_grant',
-      serverSelectionTimeoutMS: 8000,
-      connectTimeoutMS: 8000,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
     });
     isConnected = true;
     connectedAt = new Date().toISOString();
     lastError = null;
     console.log(`[MongoDB] Connected to ${mongoose.connection.host}/${mongoose.connection.name}`);
 
-    // Retire the dummy faculty that were used before the real directory.
-    await User.deleteMany({ userId: { $in: ['usr-ananya', 'usr-vikram'] } }).catch(() => {});
-    await User.deleteMany({ email: { $in: ['ananya.rao@mist.edu.in', 'vikram.sen@mist.edu.in'] } }).catch(() => {});
+    // Retire any legacy dummy users (Ananya Rao, Vikram Sen, Meera Iyer) and old duplicate domains.
+    await User.deleteMany({
+      $or: [
+        { userId: { $in: ['usr-ananya', 'usr-vikram', 'usr-meera'] } },
+        { email: { $in: ['ananya.rao@mist.edu.in', 'vikram.sen@mist.edu.in'] } },
+        { email: { $regex: /@kletech\.ac\.in$/i } },
+        { Name: { $regex: /ananya|vikram|meera\s*iyer/i } },
+      ],
+    }).catch(() => {});
 
     // Upsert institutional people so every actor/approver has a linked user row.
     // Existing rows are updated in place (e.g. a renamed Dean) by userId.

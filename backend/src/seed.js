@@ -102,9 +102,12 @@ const INSTITUTION = {
 
 const PERSONNEL = [
   { id: 'per-uma', name: 'Dr. Uma Mudengudi', role: 'PI', title: 'Dean (R&D) & Professor', department: 'SoECE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['embedded systems', 'VLSI', 'applied AI'] },
-  { id: 'per-suneeta', name: 'Dr. Suneeta V Budihal', role: 'Co-I', title: 'Faculty Member', department: 'SoECE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['computer vision', 'education technology'] },
-  { id: 'per-arun', name: 'Dr. Arun Y Patil', role: 'Co-I', title: 'Faculty Member', department: 'SME', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['design', 'tribology'] },
+  { id: 'per-suneeta', name: 'Dr. Suneeta V Budihal', role: 'PI', title: 'Faculty Member', department: 'SoECE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['computer vision', 'precision agriculture'] },
+  { id: 'per-satyadhyan', name: 'Dr. Satyadhyan Chickerur', role: 'PI', title: 'Faculty Member', department: 'CSE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['distributed computing', 'diabetic retinopathy'] },
+  { id: 'per-arun', name: 'Dr. Arun Y Patil', role: 'Co-I', title: 'Faculty Member', department: 'SME', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['design', 'tribology', 'materials'] },
   { id: 'per-ujwala', name: 'Dr. Ujwala Patil', role: 'Co-I', title: 'Faculty Member', department: 'ECE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['visual intelligence', 'medical imaging'] },
+  { id: 'per-sangeeta', name: 'Dr. Sangeeta B Kolavekar', role: 'Co-I', title: 'Faculty Member', department: 'Physics', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['metal nano particles', 'optodevices'] },
+  { id: 'per-saroja', name: 'Dr. Saroja V Siddamal', role: 'Co-I', title: 'Faculty Member', department: 'SoECE', monthlyCost: 0, defaultEffortPct: 10, careerStage: 'associate', expertise: ['LPWAN', 'ASIC/SoC'] },
   { id: 'per-ra', name: 'Research Associate (to be appointed)', role: 'RA', title: 'Research Associate', department: 'Research Office', monthlyCost: 48000, defaultEffortPct: 100, careerStage: 'n/a', expertise: [] },
   { id: 'per-phd', name: 'Doctoral Scholar (to be appointed)', role: 'PhD', title: 'Doctoral Scholar', department: 'Research Office', monthlyCost: 36000, defaultEffortPct: 100, careerStage: 'n/a', expertise: [] },
 ];
@@ -122,7 +125,7 @@ const RATE_CARD = {
 const USERS = [
   { id: 'usr-krishnan', name: 'Dr. Uma Mudengudi', email: 'uma.mudengudi@mist.edu.in', password: 'password123', role: 'dean', title: 'Dean, Research & Development', department: 'Office of Dean R&D', permissions: ['run:create', 'run:read:all', 'review:approve', 'package:view', 'audit:read', 'version:rollback', 'metrics:read'] },
   ...facultyUsers(),
-  { id: 'usr-meera', name: 'Meera Iyer', email: 'grants.cell@mist.edu.in', password: 'password123', role: 'research_office', title: 'Research Office — Grants Cell', department: 'Research Office', permissions: ['run:create', 'run:read:all', 'review:approve', 'package:view', 'audit:read', 'version:rollback'] },
+  { id: 'usr-research-office', name: 'Research & Development Office', email: 'grants.cell@mist.edu.in', password: 'password123', role: 'research_office', title: 'Grants Cell & Compliance', department: 'Office of Dean R&D', permissions: ['run:create', 'run:read:all', 'review:approve', 'package:view', 'audit:read', 'version:rollback'] },
   { id: 'usr-admin', name: 'Platform Administrator', email: 'admin@mist.edu.in', password: 'password123', role: 'admin', title: 'AURA Platform Administrator', department: 'Central IT', permissions: ['run:create', 'run:read:all', 'review:approve', 'audit:read', 'version:rollback', 'metrics:read', 'connector:invoke'] },
 ];
 

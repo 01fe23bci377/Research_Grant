@@ -20,7 +20,7 @@ function actorFrom(req) {
     const matched = USERS.find((u) => token.includes(u.id));
     if (matched) tokenUserId = matched.id;
   }
-  const id = tokenUserId || req.get('x-actor-id') || req.body?.actorId || req.query?.actorId || 'usr-ananya';
+  const id = tokenUserId || req.get('x-actor-id') || req.body?.actorId || req.query?.actorId || 'usr-suneeta-v-budihal';
   const actor = USERS.find((u) => u.id === id) || USERS[0];
   return actor;
 }
@@ -165,13 +165,34 @@ const llmDrafting = require('./llm-drafting');
   /* ------------------------------- users / faculty ------------------------ */
   app.get('/api/users', wrap(async (req, res) => {
     const people = await persistence.people();
+    const mongoStatus = await persistence.status();
     res.json({
+      source: mongoStatus.connected ? 'mongodb' : 'fallback',
+      orm: 'mongoose',
+      model: 'User',
+      collection: 'users',
+      total: people.length,
       users: people,
-      mongo: await persistence.status(),
+      mongo: mongoStatus,
       schema: {
+        model: 'User',
         collection: 'users',
         required: ['Name', 'Role', 'Dept', 'email'],
         roleEnum: ['dean', 'pi', 'faculty', 'research_office', 'admin'],
+        fields: {
+          Name: { type: 'String', required: true, description: 'Faculty full name with academic honorific' },
+          Role: { type: 'String', required: true, enum: ['dean', 'pi', 'faculty', 'research_office', 'admin'], description: 'Institutional access role' },
+          Dept: { type: 'String', required: true, description: 'Academic department or school' },
+          email: { type: 'String', required: true, unique: true, description: 'Institutional email address' },
+          password: { type: 'String', default: 'password123' },
+          title: { type: 'String', description: 'Academic designation / administrative office' },
+          userId: { type: 'String', description: 'Institutional user identifier' },
+          permissions: { type: '[String]', description: 'Governed RBAC permission tokens' },
+          careerStage: { type: 'String', enum: ['assistant', 'associate', 'professor', 'n/a'], default: 'associate' },
+          expertise: { type: '[String]', description: 'Domain keywords for grant matching' },
+          monthlyCost: { type: 'Number', default: 150000 },
+          isActive: { type: 'Boolean', default: true },
+        },
         links: ['runs.actorRef', 'runs.approval.decidedByRef', 'audit_events.actorRef', 'versions.approvedByRef'],
       },
     });
@@ -196,6 +217,84 @@ const llmDrafting = require('./llm-drafting');
   app.get('/api/mongo/status', wrap(async (req, res) => {
     res.json(await persistence.status());
   }));
+
+  app.get('/api/mongo/schemas', wrap(async (req, res) => {
+    const models = require('./models');
+    const mongoose = models.mongoose;
+    const modelKeys = ['User', 'Project', 'Run', 'AuditEvent', 'Version'];
+    const schemasInfo = {};
+
+    for (const key of modelKeys) {
+      const model = models[key];
+      if (!model || !model.schema) continue;
+      const paths = {};
+      for (const [pathname, schemaType] of Object.entries(model.schema.paths)) {
+        paths[pathname] = {
+          instance: schemaType.instance,
+          required: Boolean(schemaType.isRequired),
+          enumValues: schemaType.enumValues || null,
+          defaultValue: typeof schemaType.defaultValue === 'function' ? '(computed)' : schemaType.defaultValue,
+        };
+      }
+      let count = null;
+      if (database.isConnected()) {
+        try {
+          count = await model.countDocuments();
+        } catch {
+          count = null;
+        }
+      }
+      schemasInfo[key] = {
+        modelName: key,
+        collectionName: model.collection?.name || key.toLowerCase() + 's',
+        paths,
+        pathCount: Object.keys(paths).length,
+        documentCount: count,
+      };
+    }
+
+    res.json({
+      connected: database.isConnected(),
+      database: database.status(),
+      orm: 'mongoose',
+      models: schemasInfo,
+      sampleSchema: {
+        model: 'User',
+        code: `const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+  Name: { type: String, required: [true, 'Name is required'], trim: true },
+  Role: {
+    type: String,
+    required: [true, 'Role is required'],
+    enum: ['dean', 'pi', 'faculty', 'research_office', 'admin'],
+    trim: true,
+    lowercase: true,
+  },
+  Dept: { type: String, required: [true, 'Department is required'], trim: true },
+  email: {
+    type: String,
+    required: [true, 'Email is required'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Valid email required'],
+  },
+  password: { type: String, default: 'password123' },
+  title: { type: String, trim: true },
+  userId: { type: String, trim: true, sparse: true },
+  permissions: { type: [String], default: [] },
+  expertise: { type: [String], default: [] },
+  careerStage: { type: String, enum: ['assistant', 'associate', 'professor', 'n/a'], default: 'associate' },
+  monthlyCost: { type: Number, default: 150000 },
+  isActive: { type: Boolean, default: true },
+}, { timestamps: true });
+
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);`,
+      },
+    });
+  }));
+
 
   app.post('/api/users', wrap(async (req, res) => {
     const { Name, Role, Dept, email, password, title, careerStage, expertise } = req.body || {};
@@ -261,9 +360,32 @@ const llmDrafting = require('./llm-drafting');
   const projectStore = require('./project-store');
 
   app.get('/api/projects', wrap(async (req, res) => {
-    const { year, department, q } = req.query;
-    const projects = await projectStore.listProjects({ year, department, q });
-    res.json({ projects, summary: await projectStore.summary(), years: projectStore.YEARS, departments: projectStore.DEPARTMENTS });
+    const { year, department, q, faculty, my } = req.query;
+    const actor = actorFrom(req);
+    // If 'my=true' or 'my=1', filter to the authenticated faculty member's name
+    const targetFaculty = (my === 'true' || my === '1') ? (actor?.Name || actor?.name) : faculty;
+    const projects = await projectStore.listProjects({ year, department, q, faculty: targetFaculty });
+    const faculties = await projectStore.getFacultiesFromDB();
+    res.json({
+      projects,
+      faculties,
+      summary: await projectStore.summary(),
+      years: projectStore.YEARS,
+      departments: projectStore.DEPARTMENTS,
+      filter: { faculty: targetFaculty || null, year: year || null, department: department || null },
+      source: 'mongodb',
+    });
+  }));
+
+  app.get('/api/faculties', wrap(async (req, res) => {
+    const faculties = await projectStore.getFacultiesFromDB();
+    res.json({
+      faculties,
+      total: faculties.length,
+      source: 'mongodb',
+      orm: 'mongoose',
+      model: 'User',
+    });
   }));
 
   app.get('/api/projects/:id', wrap(async (req, res) => {

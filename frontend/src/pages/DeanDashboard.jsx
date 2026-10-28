@@ -180,7 +180,7 @@ export default function DeanDashboard() {
                     <td><span className="mono strong">{r.id}</span></td>
                     <td>
                       <div className="strong" style={{ fontSize: 13 }}>{r.title}</div>
-                      <div className="tiny" style={{ color: 'var(--muted)' }}>PI: {r.actor?.name || 'Dr. Ananya Rao'} · {r.domain}</div>
+                      <div className="tiny" style={{ color: 'var(--muted)' }}>PI: {r.actor?.name || 'Dr. Suneeta V Budihal'} · {r.domain}</div>
                     </td>
                     <td>
                       <Badge tone="indigo">{r.call?.agency || 'Government'}</Badge>

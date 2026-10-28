@@ -35,7 +35,7 @@ const HEALTH_PARAMS = {
 };
 
 async function runPipeline(params = HEALTH_PARAMS, faults = []) {
-  const run = engine.createRun({ request: `${params.researchArea}.`, params, consent: true, actorId: 'usr-ananya', faults });
+  const run = engine.createRun({ request: `${params.researchArea}.`, params, consent: true, actorId: 'usr-suneeta-v-budihal', faults });
   db.addRun(run);
   await engine.execute(run);
   return run;
@@ -120,7 +120,7 @@ test('Lab 10 — injected faults are diagnosed and repaired within the retry bud
 
 test('Lab 12 — only an authorised role can approve; versions and rollback persist', async () => {
   const run = await runPipeline();
-  const pi = USERS.find((u) => u.id === 'usr-ananya');
+  const pi = USERS.find((u) => u.id === 'usr-suneeta-v-budihal');
   const dean = USERS.find((u) => u.id === 'usr-krishnan');
   assert.equal(engine.governance.canApprove(pi), false);
   assert.throws(() => engine.governance.approveRun(run, pi, { decision: 'approve' }), /permission/);
@@ -141,7 +141,7 @@ test('Lab 12 — only an authorised role can approve; versions and rollback pers
 
 test('Guardrail — a run for an ineligible career stage is not silently accepted', async () => {
   const params = { ...HEALTH_PARAMS, careerStage: 'professor', fundingType: 'government' };
-  const run = engine.createRun({ request: `${params.researchArea}.`, params, consent: true, actorId: 'usr-ananya' });
+  const run = engine.createRun({ request: `${params.researchArea}.`, params, consent: true, actorId: 'usr-suneeta-v-budihal' });
   db.addRun(run);
   await engine.execute(run);
   // Either an eligible call is found, or the run escalates instead of shipping an ineligible request.

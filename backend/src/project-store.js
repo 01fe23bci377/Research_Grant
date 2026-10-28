@@ -45,14 +45,36 @@ async function seedProjects() {
   return { seeded: true, count: PROJECTS.length, upserted };
 }
 
-async function listProjects({ year, department, q } = {}) {
+async function listProjects({ year, department, q, faculty } = {}) {
   if (ready()) {
     const filter = {};
-    if (year) filter.year = year;
-    if (department) filter.department = department;
-    if (q) filter.$or = [{ title: new RegExp(q, 'i') }, { agency: new RegExp(q, 'i') }, { pi: new RegExp(q, 'i') }];
+    if (year && year !== 'all') filter.year = year;
+    if (department && department !== 'all') filter.department = department;
+
+    const conditions = [];
+
+    if (q) {
+      const qReg = new RegExp(String(q).trim(), 'i');
+      conditions.push({ $or: [{ title: qReg }, { agency: qReg }, { pi: qReg }, { coPIs: qReg }, { department: qReg }] });
+    }
+
+    if (faculty) {
+      // Strip honorifics (Dr., Prof., Mr., Mrs.) and match PI or Co-PI
+      const cleanName = String(faculty).replace(/^(Dr\.|Prof\.|Mr\.|Mrs\.|Ms\.)\s*/i, '').trim();
+      if (cleanName) {
+        const facReg = new RegExp(cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        conditions.push({ $or: [{ pi: facReg }, { coPIs: facReg }] });
+      }
+    }
+
+    if (conditions.length === 1) {
+      Object.assign(filter, conditions[0]);
+    } else if (conditions.length > 1) {
+      filter.$and = conditions;
+    }
+
     const docs = await Project.find(filter).sort({ year: -1, projectId: 1 }).lean();
-    if (docs.length) {
+    if (docs.length || year || department || q || faculty) {
       return docs.map((d) => ({
         id: d.projectId,
         year: d.year,
@@ -72,8 +94,59 @@ async function listProjects({ year, department, q } = {}) {
       }));
     }
   }
-  return PROJECTS.filter((p) => (!year || p.year === year) && (!department || p.department === department) && (!q || `${p.title} ${p.agency} ${p.pi.join(' ')}`.toLowerCase().includes(String(q).toLowerCase())));
+
+  // Memory fallback if MongoDB offline
+  return PROJECTS.filter((p) => {
+    const matchYear = !year || year === 'all' || p.year === year;
+    const matchDept = !department || department === 'all' || p.department === department;
+    const matchQ = !q || `${p.title} ${p.agency} ${p.pi.join(' ')} ${p.department}`.toLowerCase().includes(String(q).toLowerCase());
+    let matchFac = true;
+    if (faculty) {
+      const clean = String(faculty).replace(/^(Dr\.|Prof\.|Mr\.|Mrs\.|Ms\.)\s*/i, '').toLowerCase().trim();
+      const allPeople = [...(p.pi || []), ...(p.coPIs || [])].join(' ').toLowerCase();
+      matchFac = allPeople.includes(clean);
+    }
+    return matchYear && matchDept && matchQ && matchFac;
+  });
 }
+
+/**
+ * Fetch all institutional faculty directly from MongoDB User collection via Mongoose ORM.
+ * Never reads from static files.
+ */
+async function getFacultiesFromDB() {
+  if (ready()) {
+    try {
+      const faculties = await database.User.find(
+        {
+          Role: { $in: ['faculty', 'pi', 'dean'] },
+          isActive: { $ne: false },
+        },
+        { Name: 1, Dept: 1, email: 1, Role: 1, userId: 1, title: 1 }
+      )
+        .sort({ Name: 1 })
+        .lean();
+
+      if (faculties.length) {
+        return faculties.map((f) => ({
+          id: f.userId || String(f._id),
+          _id: String(f._id),
+          Name: f.Name,
+          name: f.Name,
+          Role: f.Role,
+          Dept: f.Dept,
+          department: f.Dept,
+          email: f.email,
+          title: f.title,
+        }));
+      }
+    } catch (err) {
+      console.warn('[MongoDB] getFacultiesFromDB error:', err.message);
+    }
+  }
+  return [];
+}
+
 
 async function getProject(id) {
   if (ready()) {
@@ -136,4 +209,4 @@ async function summary() {
   };
 }
 
-module.exports = { seedProjects, listProjects, getProject, saveBudget, summary, normalizeBudget, YEARS, DEPARTMENTS };
+module.exports = { seedProjects, listProjects, getProject, saveBudget, summary, normalizeBudget, getFacultiesFromDB, YEARS, DEPARTMENTS };

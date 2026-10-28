@@ -47,6 +47,9 @@ async function ensureUser(actor) {
   const userId = actor.userId || actor.id;
   const key = email || userId;
   if (!key) return null;
+  if (/ananya|vikram|meera\s*iyer/i.test(`${actor.Name || ''} ${actor.name || ''} ${email} ${userId}`)) {
+    return null;
+  }
   if (userCache.has(key)) return userCache.get(key);
   try {
     let doc = null;

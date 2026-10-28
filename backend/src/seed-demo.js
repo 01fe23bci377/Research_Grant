@@ -39,26 +39,26 @@ const EDU_PARAMS = {
   sampleSize: 1200,
 };
 
-async function seedDemo({ force = false } = {}) {
+async function seedDemo({ force = false, actorId = 'usr-suneeta-v-budihal' } = {}) {
   if (db.state.runs.length && !force) return { seeded: false, reason: 'workspace already has runs', runs: db.state.runs.map((r) => r.id) };
   const previousDelay = config.stepDelayMs;
   config.stepDelayMs = 25;
   const created = [];
   try {
-    const run1 = engine.createRun({ request: HEALTH_REQUEST, params: HEALTH_PARAMS, consent: true, actorId: 'usr-ananya' });
+    const run1 = engine.createRun({ request: HEALTH_REQUEST, params: HEALTH_PARAMS, consent: true, actorId });
     db.addRun(run1);
     await engine.execute(run1);
     created.push(run1);
     if (run1.status === 'awaiting_review' && run1.acceptance?.allPass) {
-      const meera = USERS.find((u) => u.id === 'usr-meera');
-      engine.governance.approveRun(run1, meera, { decision: 'approve', notes: 'Seeded demonstration package reviewed by the Research Office.' });
+      const ro = USERS.find((u) => u.role === 'research_office' || u.id === 'usr-research-office');
+      if (ro) engine.governance.approveRun(run1, ro, { decision: 'approve', notes: 'Seeded demonstration package reviewed by the Research Office.' });
     }
 
     // The second seed stays deterministic so the workspace does not burn the
     // on-demand Groq token budget before the user creates their own run.
     const previousLlm = process.env.AURA_LLM;
     process.env.AURA_LLM = 'off';
-    const run2 = engine.createRun({ request: EDU_REQUEST, params: EDU_PARAMS, consent: true, actorId: 'usr-ananya' });
+    const run2 = engine.createRun({ request: EDU_REQUEST, params: EDU_PARAMS, consent: true, actorId });
     db.addRun(run2);
     await engine.execute(run2);
     created.push(run2);

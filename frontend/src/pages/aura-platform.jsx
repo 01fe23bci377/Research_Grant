@@ -22,12 +22,25 @@ export default function Platform() {
   const [running, setRunning] = useState(false);
   const [llm, setLlm] = useState(null);
   const [mongo, setMongo] = useState(null);
+  const [schemas, setSchemas] = useState(null);
   const [prompt, setPrompt] = useState('In two sentences, explain why federated learning suits rural diabetic-retinopathy screening.');
   const [genResult, setGenResult] = useState(null);
   const [testing, setTesting] = useState(false);
 
-  const load = () => Promise.all([endpoints.connector(), endpoints.skills(), endpoints.llmStatus(), endpoints.mongoStatus()])
-    .then(([c, s, l, m]) => { setConn(c); setSkills(s); setLlm(l); setMongo(m); })
+  const load = () => Promise.all([
+    endpoints.connector(),
+    endpoints.skills(),
+    endpoints.llmStatus(),
+    endpoints.mongoStatus(),
+    endpoints.mongoSchemas().catch(() => null),
+  ])
+    .then(([c, s, l, m, sch]) => {
+      setConn(c);
+      setSkills(s);
+      setLlm(l);
+      setMongo(m);
+      if (sch) setSchemas(sch);
+    })
     .catch(() => {});
   useEffect(() => { load(); const id = setInterval(load, 6000); return () => clearInterval(id); }, []);
 
@@ -219,6 +232,67 @@ export default function Platform() {
                   </div>
                 </Card>
               </div>
+
+              {/* Mongoose ORM Models & Schemas */}
+              <Card
+                title="Mongoose ORM Schemas"
+                subtitle="Strict Object-Document Mappings and validation rules"
+                actions={<Badge tone="indigo">ORM: Mongoose 9.x</Badge>}
+              >
+                <p style={{ margin: '0 0 14px', fontSize: 12.5, color: 'var(--muted)' }}>
+                  All grant operations, institutional users, project portfolios, and runtime versions are mapped through strict Mongoose schemas with BSON type validation.
+                </p>
+                <div className="grid g3" style={{ gap: 12 }}>
+                  {Object.values(schemas?.models || {}).map((m) => (
+                    <div
+                      key={m.modelName}
+                      style={{
+                        padding: '12px 14px',
+                        borderRadius: 10,
+                        border: '1px solid var(--line)',
+                        background: '#f8fafc',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <span className="mono strong" style={{ fontSize: 13, color: 'var(--ink)' }}>
+                          {m.modelName}
+                        </span>
+                        <Badge tone="blue">
+                          {m.documentCount !== null ? `${m.documentCount} docs` : 'live'}
+                        </Badge>
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 8 }}>
+                        Collection: <span className="mono">{m.collectionName}</span> · {m.pathCount} paths
+                      </div>
+                      <div className="chips" style={{ gap: 4 }}>
+                        {Object.entries(m.paths || {})
+                          .slice(0, 6)
+                          .map(([p, info]) => (
+                            <span
+                              key={p}
+                              className="chip mono"
+                              style={{
+                                fontSize: 10,
+                                padding: '2px 6px',
+                                fontWeight: info.required ? 700 : 400,
+                                background: info.required ? '#e0e7ff' : '#f1f5f9',
+                                color: info.required ? '#3730a3' : '#475569',
+                              }}
+                            >
+                              {p}
+                              {info.required ? '*' : ''}
+                            </span>
+                          ))}
+                        {(m.pathCount || 0) > 6 && (
+                          <span className="chip" style={{ fontSize: 10, padding: '2px 6px' }}>
+                            +{m.pathCount - 6} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
             </div>
           )}
 

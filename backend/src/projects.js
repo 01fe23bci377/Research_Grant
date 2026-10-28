@@ -9,25 +9,25 @@ const PROJECTS = [
   // ---------------------------- 2023-24 ----------------------------
   { id: 'PRJ-2324-01', year: '2023-24', department: 'SoECE', title: 'Digital Creation to Enable Gamification Based on Indian Ethos', pi: ['Dr. Uma Mudengudi', 'Dr. Meena S M', 'Dr. Sujatha C'], agency: 'SERB-INAE', amountLakh: 63.89 },
   { id: 'PRJ-2324-02', year: '2023-24', department: 'Physics', title: 'Study of optical and transport properties of Metal Nano particles doped lithium bismuth borate glasses for the optoelectronic device and biomaterial applications', pi: ['Dr. Sangeeta B Kolavekar'], agency: 'VGST', amountLakh: 30.00 },
-  { id: 'PRJ-2324-03', year: '2023-24', department: 'A&R', title: 'Development of 3D Digital Twin of PCB/maker', pi: ['Girish Karkatti'], agency: 'La Fondation Dassault Systemes', amountLakh: 0.50 },
+  { id: 'PRJ-2324-03', year: '2023-24', department: 'A&R', title: 'Development of 3D Digital Twin of PCB/maker', pi: ['Girish Karikatti'], agency: 'La Fondation Dassault Systemes', amountLakh: 0.50 },
 
   // ---------------------------- 2022-23 ----------------------------
   { id: 'PRJ-2223-01', year: '2022-23', department: 'SoECE', title: 'e Krushi Precision Agriculture', pi: ['Dr. Suneeta V Budihal'], coPIs: ['Dr. Saroja V Siddamal'], agency: 'SERB Power', amountLakh: 15.68 },
-  { id: 'PRJ-2223-02', year: '2022-23', department: 'A&R', title: 'Development of Cobots integrated with Autonomous Mobile Robots (AMRs) for automation of warehousing logistics and delivery planning', pi: ['Sachin Karadai'], agency: 'La Fondation Dassault Systemes', amountLakh: 7.20 },
+  { id: 'PRJ-2223-02', year: '2022-23', department: 'A&R', title: 'Development of Cobots integrated with Autonomous Mobile Robots (AMRs) for automation of warehousing logistics and delivery planning', pi: ['Sachin Karadgi'], agency: 'La Fondation Dassault Systemes', amountLakh: 7.20 },
   { id: 'PRJ-2223-03', year: '2022-23', department: 'SAS', title: 'Bio-chemically synthesized nanomaterials for the detection and degradation of pesticides', pi: ['Nagaraj Shetty'], agency: 'SERB', amountLakh: 28.69 },
   { id: 'PRJ-2223-04', year: '2022-23', department: 'SME', title: 'Project Development of a Design Framework to Practice Nature Inspired Design for Product Innovation', pi: ['Gururaj Fattepur'], coPIs: ['Dr. Arun Y Patil'], agency: 'La Fondation Dassault Systemes', amountLakh: 5.52 },
   { id: 'PRJ-2223-05', year: '2022-23', department: 'SAS', title: 'Microbial Electrosynthesis based production of ethylene from the valorization of food and processing waste', pi: ['Mohanakrishna Gunda', 'Dr. Nagaraj P Shetty'], agency: 'SERB', amountLakh: 46.01 },
-  { id: 'PRJ-2223-06', year: '2022-23', department: 'A&R', title: 'Design and development of multi mobile robot path planning and navigation system Framework', pi: ['Shridhar Doddamani'], agency: 'La Fondation Dassault Systemes', amountLakh: 11.00 },
+  { id: 'PRJ-2223-06', year: '2022-23', department: 'A&R', title: 'Design and development of multi mobile robot path planning and navigation system Framework', pi: ['Shridhar Dodamani'], agency: 'La Fondation Dassault Systemes', amountLakh: 11.00 },
   { id: 'PRJ-2223-07', year: '2022-23', department: 'SoECE', title: 'MATOMAC: Development of LPWAN ASIC/SoC', pi: ['Saroja Siddamal'], coPIs: ['Dr. Suneeta V Budihal'], agency: 'MeitY', amountLakh: 500.00 },
   { id: 'PRJ-2223-08', year: '2022-23', department: 'SAS', title: 'Green synthesis of nanoparticles in developing electronanalytical sensors for pharmaceutical and biomedical applications', pi: ['Dr. Shweta J Malode'], coPIs: ['Nagaraj Shetty'], agency: 'VGST', amountLakh: 3.00 },
   { id: 'PRJ-2223-09', year: '2022-23', department: 'SoECE', title: 'Research changes and Application in Visual Intelligence', pi: ['Dr. Ujwala Patil'], agency: 'AICTE', amountLakh: 3.00 },
-  { id: 'PRJ-2223-10', year: '2022-23', department: 'SoECE', title: 'Meity-Qcal-QSDL-Diabetic Retinopathy', pi: ['Dr. Satyadhyan Chickerur'], agency: 'Meity', amountLakh: 15.88 },
+  { id: 'PRJ-2223-10', year: '2022-23', department: 'SoCSE', title: 'Meity-Qcal-QSDL-Diabetic Retinopathy', pi: ['Dr. Satyadhyan Chickerur'], agency: 'Meity', amountLakh: 15.88 },
 
   // ---------------------------- 2021-22 ----------------------------
   { id: 'PRJ-2122-01', year: '2021-22', department: 'ECE', title: 'Speech Database resources for speaker recognition', pi: ['Dr S R Nirmala', 'Satish Chikkamath'], agency: 'MEITY', amountLakh: 22.23 },
   { id: 'PRJ-2122-02', year: '2021-22', department: 'E&E', title: 'Intelligent Machines', pi: ['Dr. Kiran R Patil'], agency: 'TIH Technology Innovation Hub – IoT Chanakya Intern 2022', amountLakh: 4.80 },
   { id: 'PRJ-2122-03', year: '2021-22', department: 'ECE', title: 'E – Krushi : Precision agriculture', pi: ['Dr Suneeta Budihal'], agency: 'Science & Engineering Research Board (SERB)', amountLakh: 22.80 },
-  { id: 'PRJ-2122-04', year: '2021-22', department: 'SME', title: 'Synthesis of Novel Bio nano material for tribological applications', pi: ['Dr N R Banapurmatti', 'Dr Arun Patil'], agency: 'AICTE RPS', amountLakh: 14.75 },
+  { id: 'PRJ-2122-04', year: '2021-22', department: 'SME', title: 'Synthesis of Novel Bio nano material for tribological applications', pi: ['Dr N R Banapurmath', 'Dr Arun Patil'], agency: 'AICTE RPS', amountLakh: 14.75 },
   { id: 'PRJ-2122-05', year: '2021-22', department: 'SME', title: 'Real time testing of sheep horn as impact resistive material for accident prone regions in consumer vehicles', pi: ['Dr Arun Patil'], agency: 'Dassault Systems Foundation', amountLakh: 12.30 },
   { id: 'PRJ-2122-06', year: '2021-22', department: 'SME', title: 'Amrita Startups', pi: ['Dr Arun Patil'], agency: 'Karnataka Start up cell (Elevate)', amountLakh: 15.00 },
   { id: 'PRJ-2122-07', year: '2021-22', department: 'BT', title: 'Development of herbal formulation/active metabolites from plant source as anticancer agent.', pi: ['Dr B S Hungund', 'Namrata Hegde'], agency: 'Institutions Innovation Council', amountLakh: 6.00 },
