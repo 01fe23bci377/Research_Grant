@@ -1,0 +1,25 @@
+{
+  "name": "aura-grants-backend",
+  "version": "1.0.0",
+  "description": "apniLeap AURA — research grant management system (8-agent pipeline, 14 labs)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "node --test tests/pipeline.test.js"
+  },
+  "keywords": [
+    "grants",
+    "agents",
+    "orchestration"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^18.0.9",
+    "express": "^5.3.0",
+    "mongodb": "^7.7.0",
+    "mongoose": "^9.11.4"
+  }
+}
